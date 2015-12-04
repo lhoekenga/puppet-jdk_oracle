@@ -195,6 +195,11 @@ define jdk_oracle::install(
             target  => $java_home,
             require => Exec["extract_jdk_${version}"],
           }
+          file { "${install_dir}/jre-${version}":
+            ensure  => link,
+            target  => "${java_home}/jre",
+            require => Exec["extract_jdk_${version}"],
+          }
         }
       }
       'Debian':  {
