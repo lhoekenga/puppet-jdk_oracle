@@ -12,10 +12,10 @@ define jdk_oracle::install(
   $ensure         = 'installed'
   ) {
 
-  $default_8_update = '11'
-  $default_8_build  = '12'
-  $default_7_update = '67'
-  $default_7_build  = '01'
+  $default_8_update = '66'
+  $default_8_build  = '17'
+  $default_7_update = '79'
+  $default_7_build  = '15'
   $default_6_update = '45'
   $default_6_build  = '06'
 
@@ -44,6 +44,7 @@ define jdk_oracle::install(
         $javaDownloadURI = "http://download.oracle.com/otn-pub/java/jdk/${version}u${version_u}-b${version_b}/jdk-${version}u${version_u}-linux-${plat_filename}.tar.gz"
         $java_home = "${install_dir}/jdk1.${version}.0_${version_u}"
         $jceDownloadURI = 'http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip'
+        $jce_dir = 'UnlimitedJCEPolicyJDK8'
       }
       '7': {
         if ($version_update != 'default'){
@@ -58,6 +59,8 @@ define jdk_oracle::install(
         }
         $javaDownloadURI = "http://download.oracle.com/otn-pub/java/jdk/${version}u${version_u}-b${version_b}/jdk-${version}u${version_u}-linux-${plat_filename}.tar.gz"
         $java_home = "${install_dir}/jdk1.${version}.0_${version_u}"
+        $jceDownloadURI = 'http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip'
+        $jce_dir = 'UnlimitedJCEPolicy'
       }
       '6': {
         if ($version_update != 'default'){
@@ -72,6 +75,8 @@ define jdk_oracle::install(
         }
         $javaDownloadURI = "https://edelivery.oracle.com/otn-pub/java/jdk/${version}u${version_u}-b${version_b}/jdk-${version}u${version_u}-linux-${plat_filename}.bin"
         $java_home = "${install_dir}/jdk1.${version}.0_${version_u}"
+        $jceDownloadURI = 'http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip'
+        $jce_dir = 'jce'
       }
       default: {
         fail("Unsupported version: ${version}.  Implement me?")
@@ -252,10 +257,9 @@ define jdk_oracle::install(
       default:   { fail("Unsupported OS: ${::osfamily}.  Implement me?") }
     }
 
-    if ( $jce and $version == '8' ) {
+    if ( $jce ) {
 
       $jceFilename = inline_template('<%= File.basename(@jceDownloadURI) %>')
-      $jce_dir = 'UnlimitedJCEPolicyJDK8'
 
       if ( $use_cache ) {
         file { "${install_dir}/${jceFilename}":
